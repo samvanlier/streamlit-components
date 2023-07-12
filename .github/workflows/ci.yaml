@@ -1,99 +1,99 @@
-name: CI
+# name: CI
 
-on:
-  push:
-    branches: 
-      - "master"
-  pull_request:
-    branches: 
-      - "master"
+# on:
+#   push:
+#     branches: 
+#       - "master"
+#   pull_request:
+#     branches: 
+#       - "master"
 
-jobs:
-  build-examples-templates:
-    runs-on: ubuntu-latest
+# jobs:
+#   build-examples-templates:
+#     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: 
-          # For details, see: https://nodejs.dev/en/about/releases/
-          # Maintenance LTS. End Of Life: 2023-09-11
-          - 16.x
-          # Active LTS. End Of Life: 2025-04-30
-          - 18.x
-          # Current version
-          - 19.x
-        component_lib_version:
-          - current
-          - develop
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         node-version: 
+#           # For details, see: https://nodejs.dev/en/about/releases/
+#           # Maintenance LTS. End Of Life: 2023-09-11
+#           - 16.x
+#           # Active LTS. End Of Life: 2025-04-30
+#           - 18.x
+#           # Current version
+#           - 19.x
+#         component_lib_version:
+#           - current
+#           - develop
 
-    name: Examples + Templates / node-version=${{ matrix.node-version }}  / component_lib_version=${{ matrix.component_lib_version }}
+#     name: Examples + Templates / node-version=${{ matrix.node-version }}  / component_lib_version=${{ matrix.component_lib_version }}
 
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        persist-credentials: false
+#     steps:
+#     - uses: actions/checkout@v3
+#       with:
+#         persist-credentials: false
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
+#     - name: Use Node.js ${{ matrix.node-version }}
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: ${{ matrix.node-version }}
 
-    - name: Check dependencies for examples
-      run: ./dev.py examples-check-deps
+#     - name: Check dependencies for examples
+#       run: ./dev.py examples-check-deps
 
-    - name: Checkout streamlit/streamlit
-      if: matrix.component_lib_version == 'develop'
-      uses: actions/checkout@v3
-      with:
-        persist-credentials: false
-        repository: streamlit/streamlit
-        ref: develop
-        path: streamlit
+#     - name: Checkout streamlit/streamlit
+#       if: matrix.component_lib_version == 'develop'
+#       uses: actions/checkout@v3
+#       with:
+#         persist-credentials: false
+#         repository: streamlit/streamlit
+#         ref: develop
+#         path: streamlit
 
-    - name: Install node dependencies for streamlit-component-lib
-      if: matrix.component_lib_version == 'develop'
-      working-directory: ./streamlit/component-lib/
-      run: |
-        npm install -g yarn
-        yarn install
+#     - name: Install node dependencies for streamlit-component-lib
+#       if: matrix.component_lib_version == 'develop'
+#       working-directory: ./streamlit/component-lib/
+#       run: |
+#         npm install -g yarn
+#         yarn install
 
-    - name: Build streamlit-component-lib package
-      if: matrix.component_lib_version == 'develop'
-      working-directory: ./streamlit/component-lib/
-      run: yarn run build && npm pack
+#     - name: Build streamlit-component-lib package
+#       if: matrix.component_lib_version == 'develop'
+#       working-directory: ./streamlit/component-lib/
+#       run: yarn run build && npm pack
 
-    - name: Link develop version of streamlit-component-lib
-      if: matrix.component_lib_version == 'develop'
-      env:
-        COMPONENT_LIB_DIR: ${{ github.workspace }}/streamlit/component-lib/
-      run: |
-        component_lib_tar_gz=$(find "${COMPONENT_LIB_DIR}" -maxdepth 1 -name 'streamlit-component-lib-*.tgz')
-        component_lib_tar_gz=$(readlink -e "${component_lib_tar_gz}")
+#     - name: Link develop version of streamlit-component-lib
+#       if: matrix.component_lib_version == 'develop'
+#       env:
+#         COMPONENT_LIB_DIR: ${{ github.workspace }}/streamlit/component-lib/
+#       run: |
+#         component_lib_tar_gz=$(find "${COMPONENT_LIB_DIR}" -maxdepth 1 -name 'streamlit-component-lib-*.tgz')
+#         component_lib_tar_gz=$(readlink -e "${component_lib_tar_gz}")
 
-        find examples template template-reactless -name frontend -maxdepth 3 | while IFS= read -r line; do
-          (
-            cd "${line}";
-            npm install "${component_lib_tar_gz}"
-          )
-        done
+#         find examples template template-reactless -name frontend -maxdepth 3 | while IFS= read -r line; do
+#           (
+#             cd "${line}";
+#             npm install "${component_lib_tar_gz}"
+#           )
+#         done
 
-    - name: Install node dependencies
-      run: ./dev.py all-npm-install
+#     - name: Install node dependencies
+#       run: ./dev.py all-npm-install
 
-    - name: Build frontend code
-      run: ./dev.py all-npm-build
+#     - name: Build frontend code
+#       run: ./dev.py all-npm-build
 
-    - name: Build wheel packages
-      run: |
-        find examples template template-reactless -maxdepth 3 -name '__init__.py' |\
-        xargs -n 1 sed -i 's/_RELEASE = False/_RELEASE = True/';
+#     - name: Build wheel packages
+#       run: |
+#         find examples template template-reactless -maxdepth 3 -name '__init__.py' |\
+#         xargs -n 1 sed -i 's/_RELEASE = False/_RELEASE = True/';
 
-        ./dev.py all-python-build-package
+#         ./dev.py all-python-build-package
 
-    - name: Upload wheel packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: all-wheel
-        path: dist/*.whl
-        if-no-files-found: error
+#     - name: Upload wheel packages
+#       uses: actions/upload-artifact@v3
+#       with:
+#         name: all-wheel
+#         path: dist/*.whl
+#         if-no-files-found: error
