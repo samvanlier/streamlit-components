@@ -1,0 +1,42 @@
+.slide-toggle-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 20px;
+    /* Adjust the margin-bottom value as needed */
+    padding-bottom: 20px;
+}
+
+.toggle-container {
+    display: flex;
+    align-items: flex-start;
+}
+
+.toggle-button {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.slide-content {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.3s ease;
+    /* margin-left: 8px; */
+    border-radius: 4px; /* Add border-radius for rounded edges */
+
+}
+
+.visible {
+    height: auto;
+    background-color: #f7f7f7;
+    padding: 16px;
+}
+
+.hidden {
+    height: 0;
+}
