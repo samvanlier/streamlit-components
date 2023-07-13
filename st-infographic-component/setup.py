@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="st_infoGraphic_component",
-    version="0.1.0",
+    version="0.1.1",
     author="Sam Van Lier",
     author_email="sam.vanlier@hotmail.com",
     description="",

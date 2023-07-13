@@ -1,5 +1,6 @@
 import os
 import streamlit.components.v1 as components
+import uuid
 
 # Create a _RELEASE constant. We'll set this to False while we're developing
 # the component, and True when we're ready to package and distribute it.
@@ -43,7 +44,7 @@ else:
 # `declare_component` and call it done. The wrapper allows us to customize
 # our component's API: we can pre-process its input args, post-process its
 # output value, and add a docstring for users.
-def infographic_component(label:str, text:str):
+def infographic_component(label:str, text:str, key=None):
     """Create a new instance of "infographic_component".
 
     Parameters
@@ -61,6 +62,8 @@ def infographic_component(label:str, text:str):
         frontend.)
 
     """
+    if key is None:
+        key = uuid.uuid4().hex
     # Call through to our private component function. Arguments we pass here
     # will be sent to the frontend, where they'll be available in an "args"
     # dictionary.
@@ -70,6 +73,7 @@ def infographic_component(label:str, text:str):
     component_value = _component_func(
         label=label, 
         text=text, 
+        key=key,
         )
 
     # We could modify the value returned from the component if we wanted.
@@ -90,5 +94,7 @@ if not _RELEASE:
     infographic_component("Toon info", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 
     st.subheader("Component with variable args")
+
+    infographic_component("Toon info", "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 
 
